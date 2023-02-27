@@ -1,0 +1,4 @@
+login = "my_login"
+max_retries = 5
+ports = [ 8000, 8001, 8002 ]
+ratio = 0.5
