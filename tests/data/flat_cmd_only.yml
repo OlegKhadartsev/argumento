@@ -1,0 +1,6 @@
+---
+login: "?:str"
+max_retries: "?:int"
+ratio: "?:float"
+ports: "?:list[int]"
+fractions: "?:list[float]"
