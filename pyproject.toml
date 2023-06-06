@@ -1,6 +1,8 @@
 [build-system]
 requires = [
-    "setuptools>=61.0"
+    "setuptools>=61.0",
+    "toml",
+    "PyYAML"
 ]
 
 build-backend = "setuptools.build_meta"
@@ -8,8 +10,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 dependencies = [
-    'toml',
-    'PyYAML'
+    "toml",
+    "PyYAML"
 ]
 
 name = "config-args"
