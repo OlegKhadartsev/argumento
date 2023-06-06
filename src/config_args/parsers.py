@@ -112,7 +112,8 @@ class ParserFactory:
             ext = ext[1:]
         parser_type = self._parsers.get(ext)
         if not parser_type:
-            raise ValueError(f'Could not infer parser from file type. Unknown file format: "{ext}"')
+            raise ValueError(f'Could not infer parser from file type. Unknown file format: "{ext}". '
+                             f'Supported formats are: {list(self._parsers.keys())}.')
         return parser_type(filename)
 
 

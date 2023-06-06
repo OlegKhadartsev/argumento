@@ -72,9 +72,9 @@ def test_flat_cmd_only(ext):
         assert args.fractions == [0.1, 0.2]
 
 
-"""
-#TODO:
-1. test hierarchy
 
-"""
+
+#TODO: test hierarchy
+
+
 
