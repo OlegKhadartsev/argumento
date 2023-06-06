@@ -74,7 +74,7 @@ def test_flat_cmd_only(ext):
 
 
 
-#TODO: test hierarchy
+#TODO: test hierarchical config
 
 
 
