@@ -5,7 +5,7 @@
 ## Installation
 
 ```bash
-pip install config_args
+pip install argumento
 ```
 
 ## Usage
@@ -22,10 +22,10 @@ Supported config file formats are:
 Basic example:
 
 ```python
-import config_args
+import argumento
 
 cfg_filename = 'my_config.yaml'
-args = config_args.create_parser(cfg_filename).parse()
+args = argumento.create_parser(cfg_filename).parse()
 ```
 
 If a parameter is required but is not set in config file, `?:` followed by type name is used instead of a value:

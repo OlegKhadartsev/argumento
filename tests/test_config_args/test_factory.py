@@ -1,12 +1,12 @@
 import pytest
 
-import config_args
+import argumento
 
 
 def test_unknown_format():
     # .ini not supported
     with pytest.raises(ValueError) as exc_info:
-        config_args.create_parser('my_file.ini').parse()
+        argumento.create_parser('my_file.ini').parse()
 
     assert exc_info.value.args[0] == "Could not infer parser from file type. Unknown file format: \"ini\". " \
                                      "Supported formats are: ['yml', 'yaml', 'toml', 'json']."
@@ -14,7 +14,7 @@ def test_unknown_format():
 
 def test_reqister_custom_parser(tmp_path):
 
-    class ParserCustomTest(config_args.parsers.ParserBase):
+    class ParserCustomTest(argumento.parsers.ParserBase):
         """
 
         custom cfg format:
@@ -32,9 +32,9 @@ def test_reqister_custom_parser(tmp_path):
                 lines = [l for l in f if ':' in l]
                 return dict([x.strip() for x in l.split(':')] for l in lines)
 
-    # assert config_args.create_parser is config_args.factory.get_parser
+    # assert argumento.create_parser is argumento.factory.get_parser
 
-    factory = config_args.parsers.ParserFactory()
+    factory = argumento.parsers.ParserFactory()
     factory.register_format('custom', ParserCustomTest)
 
     cfg_filename = "cfg.custom"

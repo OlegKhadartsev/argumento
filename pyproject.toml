@@ -1,8 +1,8 @@
 [build-system]
 requires = [
     "setuptools>=61.0",
-    "toml",
-    "PyYAML"
+    "toml>=0.10",
+    "PyYAML>=6.0"
 ]
 
 build-backend = "setuptools.build_meta"
@@ -10,11 +10,11 @@ build-backend = "setuptools.build_meta"
 
 [project]
 dependencies = [
-    "toml",
-    "PyYAML"
+    "toml>=0.10",
+    "PyYAML>=6.0"
 ]
 
-name = "config-args"
+name = "argumento"
 authors = [
   { name="OK111", email="oleg.khadartsev@gmail.com" },
 ]
@@ -31,7 +31,7 @@ classifiers = [
 dynamic = ["version"]
 
 [tool.setuptools.dynamic]
-version = {attr = "config_args.__version__"}
+version = {attr = "argumento.__version__"}
 
 [project.urls]
 "Homepage" = "https://github.com/OlegKhadartsev/config-args"

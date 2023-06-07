@@ -4,7 +4,7 @@ from unittest import mock
 
 import pytest
 
-import config_args
+from argumento import create_parser
 
 
 EXTENSIONS = ['toml', 'yaml', 'yml', 'json']
@@ -19,7 +19,7 @@ def locate_data_file(filename):
 @pytest.mark.parametrize('ext', EXTENSIONS)
 def test_flat(ext):
     cfg_filename = locate_data_file(f'flat.{ext}')
-    args = config_args.create_parser(cfg_filename).parse()
+    args = create_parser(cfg_filename).parse()
 
     assert args.login == "my_login"
     assert args.max_retries == 5
@@ -32,7 +32,7 @@ def test_flat_cmd_override(ext):
     cfg_filename = locate_data_file(f'flat.{ext}')
     cmd_args = ['', '--login', 'login_from_cmd', '--max_retries', '3']
     with mock.patch.object(sys, 'argv', cmd_args):
-        args = config_args.create_parser(cfg_filename).parse()
+        args = create_parser(cfg_filename).parse()
 
         # these args were overridden in command-line
         assert args.login == "login_from_cmd"
@@ -53,7 +53,7 @@ def test_redundant_cmd_args(ext):
     cfg_filename = locate_data_file(f'flat.{ext}')
     cmd_args = ['', '--login', 'login_from_cmd', '--max_retries', '3', '--redundant-arg', '123']
     with mock.patch.object(sys, 'argv', cmd_args):
-        args = config_args.create_parser(cfg_filename).parse()
+        args = create_parser(cfg_filename).parse()
 
 
 @pytest.mark.parametrize('ext', EXTENSIONS)
@@ -63,7 +63,7 @@ def test_flat_cmd_only(ext):
                 '--fractions', '0.1, 0.2']
     with mock.patch.object(sys, 'argv', cmd_args):
 
-        args = config_args.create_parser(cfg_filename).parse()
+        args = create_parser(cfg_filename).parse()
 
         assert args.login == "login_from_cmd"
         assert args.max_retries == 3
