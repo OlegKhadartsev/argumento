@@ -66,7 +66,7 @@ class ParserToml(ParserBase):
         super().__init__(config_file)
 
     def _read_config(self) -> dict:
-        with open(self._config_file, "r") as f:
+        with open(self._config_file, 'r', encoding='utf8') as f:
             return toml.load(f)
 
 
@@ -75,7 +75,7 @@ class ParserYaml(ParserBase):
         super().__init__(config_file)
 
     def _read_config(self) -> dict:
-        with open(self._config_file, "r") as f:
+        with open(self._config_file, 'r', encoding='utf8') as f:
             return yaml.safe_load(f)
 
 
@@ -84,7 +84,7 @@ class ParserJson(ParserBase):
         super().__init__(config_file)
 
     def _read_config(self) -> dict:
-        with open(self._config_file, "r") as f:
+        with open(self._config_file, 'r', encoding='utf8') as f:
             return json.loads(f.read(), encoding='utf8')
 
 
