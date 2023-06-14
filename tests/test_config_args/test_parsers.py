@@ -72,9 +72,33 @@ def test_flat_cmd_only(ext):
         assert args.fractions == [0.1, 0.2]
 
 
+@pytest.mark.parametrize('ext', EXTENSIONS)
+def test_hierarch(ext):
+    cfg_filename = locate_data_file(f'hierarch.{ext}')
+    args = create_parser(cfg_filename).parse()
 
+    assert args.database == {"ports": [ 8000, 8001, 8002 ], "connection_max": 5000, "enabled": True}
+    assert args['database'] == args.database
+    assert args.database.ports == [8000, 8001, 8002]
+    assert args.database.ports == args.database['ports']
+    assert args.database.ports == args['database'].ports
+    assert args.database.ports == args['database.ports']
+    assert args.database.connection_max == 5000
+    assert args.database.connection_max == args.database['connection_max']
+    assert args.database.connection_max == args['database'].connection_max
+    assert args.database.connection_max == args['database.connection_max']
 
-#TODO: test hierarchical config
+    assert args.database.enabled == True
+
+    assert args.servers.alpha == {'ip': '10.0.0.1', 'dc': 'abcd'}
+    assert args.servers.alpha.ip == '10.0.0.1'
+    assert args.servers.alpha.dc == 'abcd'
+
+    assert args.servers.beta == {'ip': '10.0.0.2', 'dc': 'efgh'}
+    assert args.servers.beta.ip == '10.0.0.2'
+    assert args.servers.beta.dc == 'efgh'
+
+#TODO: test hierarchical config - overwrite params in cmd
 
 
 

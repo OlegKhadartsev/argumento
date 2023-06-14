@@ -10,6 +10,8 @@ import yaml
 import builtins
 from argparse import Namespace
 
+from argumento.namespace_dict import NamespaceDict
+
 
 class ParserBase(ABC):
     def __init__(self, config_file: str):
@@ -19,11 +21,11 @@ class ParserBase(ABC):
     def _read_config(self):
         pass
 
-    def parse(self) -> Namespace:
+    def parse(self) -> NamespaceDict:
         cfg_file_dict = self._read_config()
         cmd_arg_parser = self._cmd_args_from_cfg_keys(cfg_file_dict)
         args, _ = cmd_arg_parser.parse_known_args()
-        return args
+        return NamespaceDict(vars(args))
 
     @classmethod
     def _cmd_args_from_cfg_keys(cls,

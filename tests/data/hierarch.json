@@ -1,0 +1,14 @@
+{
+"database":
+  {"ports": [ 8000, 8001, 8002 ],
+  "connection_max": 5000,
+  "enabled": true
+  },
+"servers":
+  {
+    "alpha": {"ip": "10.0.0.1", "dc": "abcd"},
+    "beta":{
+      "ip": "10.0.0.2",
+      "dc": "efgh"}
+  }
+}

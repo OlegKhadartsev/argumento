@@ -8,8 +8,8 @@ enabled = true
 [servers]
     [servers.alpha]
     ip = "10.0.0.1"
-#    dc = "?:str"
+    dc = "abcd"
 
     [servers.beta]
     ip = "10.0.0.2"
-    dc = "eqdc10"
+    dc = "efgh"
