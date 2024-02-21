@@ -13,6 +13,17 @@ from argparse import Namespace
 from argumento.namespace_dict import NamespaceDict
 
 
+def str2bool(v):
+    if isinstance(v, bool):
+        return v
+    if v.lower() in ('yes', 'true', 't', 'y', '1'):
+        return True
+    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
+        return False
+    else:
+        raise argparse.ArgumentTypeError('Boolean value expected.')
+
+
 class ParserBase(ABC):
     def __init__(self, config_file: str):
         self._config_file = config_file
@@ -58,6 +69,8 @@ class ParserBase(ABC):
                         cmd_parser.add_argument(f'--{full_key_name}', required=True, type=type_)
                 else:
                     cmd_parser.add_argument(f'--{full_key_name}', type=str, default=v)
+            elif isinstance(v, bool):
+                cmd_parser.add_argument(f'--{full_key_name}', type=str2bool, default=v)
             else:
                 cmd_parser.add_argument(f'--{full_key_name}', type=type(v), default=v)
         return cmd_parser

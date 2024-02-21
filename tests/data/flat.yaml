@@ -3,3 +3,6 @@ login: "my_login"
 max_retries: 5
 ports: [ 8000, 8001, 8002 ]
 ratio: 0.5
+# to be overridden from command line:
+nice_bool_false: True
+nice_bool_true: False

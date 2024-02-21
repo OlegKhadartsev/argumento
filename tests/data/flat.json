@@ -2,5 +2,7 @@
   "login": "my_login",
   "max_retries": 5,
   "ports": [ 8000, 8001, 8002 ],
-  "ratio": 0.5
+  "ratio": 0.5,
+  "nice_bool_false": true,
+  "nice_bool_true": false
 }

@@ -30,13 +30,16 @@ def test_flat(ext):
 @pytest.mark.parametrize('ext', EXTENSIONS)
 def test_flat_cmd_override(ext):
     cfg_filename = locate_data_file(f'flat.{ext}')
-    cmd_args = ['', '--login', 'login_from_cmd', '--max_retries', '3']
+    cmd_args = ['', '--login', 'login_from_cmd', '--max_retries', '3',
+                '--nice_bool_false', 'False', '--nice_bool_true', 'true']
     with mock.patch.object(sys, 'argv', cmd_args):
         args = create_parser(cfg_filename).parse()
 
         # these args were overridden in command-line
         assert args.login == "login_from_cmd"
         assert args.max_retries == 3
+        assert args.nice_bool_false == False
+        assert args.nice_bool_true == True
 
         # these args were read from config file
         assert args.ports == [8000, 8001, 8002]
@@ -70,6 +73,7 @@ def test_flat_cmd_only(ext):
         assert args.ratio == 0.2
         assert args.ports == [5000, 5001]
         assert args.fractions == [0.1, 0.2]
+
 
 
 @pytest.mark.parametrize('ext', EXTENSIONS)
