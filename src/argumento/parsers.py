@@ -50,7 +50,7 @@ class EnvResolver:
                 yield nested, key, value
 
     def _parse_string(self, value: str):
-        """Pattern-matches string with self.pattern, substitutes match groupus with os.environ/default values"""
+        """Pattern-matches string with self.pattern, substitutes match groups with os.environ/default values"""
         def replacer(match):
             var_name = match.group(1)
             default_value = match.group(2) if match.group(2) is not None else self.default_value
