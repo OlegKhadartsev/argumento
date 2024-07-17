@@ -100,7 +100,8 @@ class ParserJson(ParserBase):
 
     def _read_config(self) -> dict:
         with open(self._config_file, 'r', encoding='utf8') as f:
-            return json.loads(f.read(), encoding='utf8')
+            data = f.read().encode("utf-8")
+            return json.loads(data)
 
 
 class ParserFactory:

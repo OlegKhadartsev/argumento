@@ -1,5 +1,12 @@
 
 # Change Log
+## [1.0.7] - 2024-07-17
+
+### Changed
+
+- manually encoding json file since 'encoding' was removed from json.loads() in Python 3.9 (for python>3.9 support)
+
+
 ## [1.0.6] - 2024-02-21
 
 ### Added
