@@ -1,14 +1,16 @@
 import argparse
 import json
 import os.path
+import os
+import re
 from abc import ABC, abstractmethod
-from typing import Union, List, Iterable, Type
+from collections import abc
+from typing import Union, List, Type
 import warnings
 
 import toml
 import yaml
 import builtins
-from argparse import Namespace
 
 from argumento.namespace_dict import NamespaceDict
 
@@ -24,9 +26,49 @@ def str2bool(v):
         raise argparse.ArgumentTypeError('Boolean value expected.')
 
 
+class EnvResolver:
+    def __init__(self):
+        self.default_value = None
+        self.pattern = re.compile(r'\$\{(\w+)(?:\|([^}]*))?\}')  # pattern: '${NAME|default}'
+
+    def _nested_dict_iter(self, nested: abc.Mapping):
+        """
+        Recursively iterates over nested (optionally) dictionary,
+          traversing list-like and dict-like structures,
+          yields on leaf nodes (to be processed).
+        """
+        for key, value in nested.items():
+            if isinstance(value, abc.Mapping):
+                yield from self._nested_dict_iter(value)
+            elif isinstance(value, list):
+                for i, item in enumerate(value):
+                    if isinstance(item, abc.Mapping):
+                        yield from self._nested_dict_iter(item)
+                    else:
+                        yield value, i, item
+            else:
+                yield nested, key, value
+
+    def _parse_string(self, value: str):
+        """Pattern-matches string with self.pattern, substitutes match groupus with os.environ/default values"""
+        def replacer(match):
+            var_name = match.group(1)
+            default_value = match.group(2) if match.group(2) is not None else self.default_value
+            return os.environ.get(var_name, default_value)
+        return self.pattern.sub(replacer, value)
+
+    def resolve_envs(self, config: dict) -> dict:
+        """Entry point for config (dict) variables recursive env. search and resolve"""
+        for container, key, value in self._nested_dict_iter(config):
+            if isinstance(value, str):
+                container[key] = self._parse_string(value)
+        return config
+
+
 class ParserBase(ABC):
     def __init__(self, config_file: str):
         self._config_file = config_file
+        self.env_resolver = EnvResolver()
 
     @abstractmethod
     def _read_config(self):
@@ -34,6 +76,7 @@ class ParserBase(ABC):
 
     def parse(self) -> NamespaceDict:
         cfg_file_dict = self._read_config()
+        cfg_file_dict = self.env_resolver.resolve_envs(cfg_file_dict)
         cmd_arg_parser = self._cmd_args_from_cfg_keys(cfg_file_dict)
         args, _ = cmd_arg_parser.parse_known_args()
         return NamespaceDict(vars(args))

@@ -1,5 +1,11 @@
-
 # Change Log
+## [1.1.0] - 2024-07-18
+
+### Added
+
+- ENV variable parsing syntax (in .yaml/yml, json, toml): ${ENV_VARIABLE|default_value}
+
+
 ## [1.0.7] - 2024-07-17
 
 ### Changed

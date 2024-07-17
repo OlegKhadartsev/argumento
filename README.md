@@ -45,6 +45,36 @@ command line:
 --ratio 0.5 --nice_bool_false False --nice_bool_true True
 ```
 
+### ENV variable parsing
+
+Supports parsing of ${ENV_VARIABLES} in strings, to strings.  
+Syntax: ${ENV_VARIABLE|default_value} or just ${ENV_VARIABLE}  
+If ENV_VARIABLE is not set - default_value (string) would be returned.  
+If default_value is also not provided - '' (empty string) would be returned as default value.    
+
+Example config.yaml:
+```yaml
+standalone_env: ${MAX_RETIES:3}
+embedded_env : 'my_name_is: ${LOGIN|admin}'
+multiple_envs: '${ADDRESS}:${PORT|8000}'
+list_like: [ '${PORT_1|8000}', '${PORT_2}', '${PORT_3}' ]
+different_style:
+  - '${PORT_1|8000}'
+  - '${PORT_2}'
+  - '${PORT_3}'
+nested:
+  here:
+    we:
+      go: ${DB_A_ADDRESS|localhost:2233}
+just_a_var: 0.5
+```
+
+Important! - parses ${ENV_VARIABLE} to strings (since env. vars are strings).  
+Integer/float env.vars/defaults would be set as strings.  
+E.g.: batch_size: ${BATCH_SIZE}, where env. variable BATCH_SIZE is set to '1' would be resolved to batch_size == '1'  
+(isinstance(batch_size, str) -> True).  
+
+
 ### Bool arguments
 Note that **bool** args should be set in command line via 'nice' but non-canonical way.
 
@@ -61,6 +91,7 @@ or
 Not supported usage:
 
 `--feature` / `--no-feature` style.
+
 
 ### Required params not defined in config
 
