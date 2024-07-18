@@ -1,6 +1,6 @@
 # Project description
 
-**config-args** is a Python library for reading configuration from config files and command-line args.
+**argumento** is a Python library for reading configuration from config files and command-line args.
 
 ## Installation
 
@@ -49,12 +49,12 @@ command line:
 
 Supports parsing of ${ENV_VARIABLES} in strings, to strings.  
 Syntax: ${ENV_VARIABLE|default_value} or just ${ENV_VARIABLE}  
-If ENV_VARIABLE is not set - default_value (string) would be returned.  
-If default_value is also not provided - '' (empty string) would be returned as default value.    
+If ENV_VARIABLE is not set, `default_value` (string) will be returned.  
+If `default_value` is also not provided, the `''` (empty string) will be returned as default value.    
 
 Example config.yaml:
 ```yaml
-standalone_env: ${MAX_RETIES:3}
+standalone_env: ${MAX_RETRIES:3}
 embedded_env : 'my_name_is: ${LOGIN|admin}'
 multiple_envs: '${ADDRESS}:${PORT|8000}'
 list_like: [ '${PORT_1|8000}', '${PORT_2}', '${PORT_3}' ]
@@ -70,9 +70,9 @@ just_a_var: 0.5
 ```
 
 Important! - parses ${ENV_VARIABLE} to strings (since env. vars are strings).  
-Integer/float env.vars/defaults would be set as strings.  
-E.g.: batch_size: ${BATCH_SIZE}, where env. variable BATCH_SIZE is set to '1' would be resolved to batch_size == '1'  
-(isinstance(batch_size, str) -> True).  
+Integer/float env.vars/defaults will be set as strings.  
+E.g.: batch_size: ${BATCH_SIZE}, where env. variable BATCH_SIZE is set to '1' will be resolved to 
+batch_size == '1' (isinstance(batch_size, str) -> True).  
 
 
 ### Bool arguments
