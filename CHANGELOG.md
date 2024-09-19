@@ -1,4 +1,10 @@
-# Change Log
+## [1.2.0] - 2024-09-19
+
+### Added
+
+- ENV variable type resolve syntax: ${ENV_VARIABLE:type|default_value} 
+
+
 ## [1.1.0] - 2024-07-18
 
 ### Added

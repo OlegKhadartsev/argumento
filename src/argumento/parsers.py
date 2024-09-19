@@ -4,6 +4,7 @@ import os.path
 import os
 import re
 from abc import ABC, abstractmethod
+from ast import literal_eval
 from collections import abc
 from typing import Union, List, Type
 import warnings
@@ -13,6 +14,14 @@ import yaml
 import builtins
 
 from argumento.namespace_dict import NamespaceDict
+
+
+class ResolveWarning(UserWarning):
+    pass
+
+
+class CastingWarning(UserWarning):
+    pass
 
 
 def str2bool(v):
@@ -28,8 +37,15 @@ def str2bool(v):
 
 class EnvResolver:
     def __init__(self):
-        self.default_value = None
-        self.pattern = re.compile(r'\$\{(\w+)(?:\|([^}]*))?\}')  # pattern: '${NAME|default}'
+        self.default_value = ""
+        self.pattern = re.compile(r'\$\{(\w+)(?::(\w+))?(?:\|([^}]*))?}')  # pattern: '${NAME:type|default}'
+
+        self.type_map = {
+            'int': int,
+            'float': float,
+            'str': str,
+            'bool': lambda v: str2bool(str(v)),
+        }
 
     def _nested_dict_iter(self, nested: abc.Mapping):
         """
@@ -49,13 +65,62 @@ class EnvResolver:
             else:
                 yield nested, key, value
 
-    def _parse_string(self, value: str):
-        """Pattern-matches string with self.pattern, substitutes match groups with os.environ/default values"""
-        def replacer(match):
-            var_name = match.group(1)
-            default_value = match.group(2) if match.group(2) is not None else self.default_value
-            return os.environ.get(var_name, default_value)
-        return self.pattern.sub(replacer, value)
+    def _resolve_match(self, match):
+        """Handles the replacement of a single match from the regex."""
+        var_name = match.group(1)  # Environment variable name
+        cast_type = match.group(2)  # Optional cast type (e.g., int, float, bool)
+        default_value = match.group(3)
+
+        env_value = os.environ.get(var_name, default_value if default_value is not None else self.default_value)
+
+        if not env_value:
+            warnings.warn(f"Environment variable '{var_name}' not found and no default provided.", ResolveWarning)
+            return env_value
+
+        # Attempt to cast the value to the specified type
+        return self._cast_value(env_value, cast_type, default_value)
+
+    def _cast_value(self, value, cast_type, default_value):
+        """Casts the value to the specified type, or evaluates literals if no cast_type is specified."""
+        try:
+            evaluated_value = literal_eval(value)
+        except (ValueError, SyntaxError):
+            evaluated_value = value
+
+        cast_func = self.type_map.get(cast_type)
+        if cast_func is None:
+            return evaluated_value
+
+        try:
+            return cast_func(evaluated_value)
+        except (ValueError, TypeError, AttributeError, argparse.ArgumentTypeError) as e:
+            if default_value is not None:
+                if cast_type is not None:
+                    warnings.warn(f"Cannot cast '{evaluated_value=}' to {cast_type}: {e}, casting {default_value=}",
+                                  CastingWarning)
+                try:
+                    default_value = literal_eval(default_value)
+                    return cast_func(default_value)
+                except (ValueError, TypeError, SyntaxError) as e_def:
+                    if cast_type is not None:
+                        warnings.warn(f"Cannot cast '{default_value=}' to {cast_type}: {e_def}, keeping as is",
+                                      CastingWarning)
+                    return default_value
+            if cast_type is not None:
+                warnings.warn(f"Cannot cast '{evaluated_value=}' to {cast_type}: {e}, keeping as is",
+                              CastingWarning)
+            return evaluated_value
+
+    def _parse_string(self, string: str):
+        """Pattern-matches string with self.pattern, substitutes match groups with os.environ/default values."""
+        all_matches = list(self.pattern.finditer(string))
+
+        # If there is exactly one match and no extra text, return the resolved type
+        if len(all_matches) == 1 and string.strip() == all_matches[0].group(0):
+            return self._resolve_match(all_matches[0])
+
+        # Otherwise, replace all matches and return the full string
+        return self.pattern.sub(lambda match: str(self._resolve_match(match)), string)
 
     def resolve_envs(self, config: dict) -> dict:
         """Entry point for config (dict) variables recursive env. search and resolve"""
