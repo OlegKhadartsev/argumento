@@ -1,6 +1,6 @@
 # Project description
 
-**config-args** is a Python library for reading configuration from config files and command-line args.
+**argumento** is a Python library for reading configuration from config files and command-line args.
 
 ## Installation
 
@@ -62,8 +62,8 @@ Resolving by ast.literal_eval() is useful to set:
 If type casting of ENV_VARIABLE fails, default_value will also try to be resolved as python-valid string and typecast.    
 If both typecasts fail - ENV_VARIABLE will be resolved as is (to string).  
 Hint: don't make typos in ENV_VARIABLE setup and there won't be any problems :)  
-If ENV_VARIABLE is not set - default_value (string) would be returned.  
-If default_value is also not provided - '' (empty string) would be returned as default value.    
+If ENV_VARIABLE is not set, `default_value` (string) will be returned.  
+If `default_value` is also not provided, the `''` (empty string) will be returned as default value.     
 
 Example config.yaml:
 ```yaml
@@ -92,12 +92,6 @@ complex_string: '/path/${A}/${B}/folder' # A and B will be resolved, casted back
 wrong_type: ${VAR:wrong_type}  # will be resolved (as python code), but not casted (with warning about wrong_type)
 
 ```
-
-Important! - parses ${ENV_VARIABLE} to strings (since env. vars are strings).  
-Integer/float env.vars/defaults would be set as strings.  
-E.g.: batch_size: ${BATCH_SIZE}, where env. variable BATCH_SIZE is set to '1' would be resolved to batch_size == '1'  
-(isinstance(batch_size, str) -> True).  
-
 
 ### Bool arguments
 Note that **bool** args should be set in command line via 'nice' but non-canonical way.
