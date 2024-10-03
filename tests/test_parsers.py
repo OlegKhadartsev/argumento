@@ -76,7 +76,7 @@ def test_hierarch(ext):
     cfg_filename = locate_data_file(f'hierarch.{ext}')
     args = create_parser(cfg_filename).parse()
 
-    assert args.database == {"ports": [ 8000, 8001, 8002 ], "connection_max": 5000, "enabled": True}
+    assert args.database == {"ports": [8000, 8001, 8002], "connection_max": 5000, "enabled": True}
     assert args['database'] == args.database
     assert args.database.ports == [8000, 8001, 8002]
     assert args.database.ports == args.database['ports']
@@ -113,29 +113,43 @@ def setup_env():
     # os.environ['IP_BETA'] = '10.0.0.1:1337'  # not set in ENV
     os.environ['DC_BETA'] = 'xyz'
 
+    # casting tests
+    os.environ['STRING_VAR'] = 'qwerty'
+    os.environ['LIST_VAR'] = '[1, 2, 3]'
+    os.environ['FLOAT_LIST_VAR'] = '[1.0, 2.0, 3.0]'
+    os.environ['BOOL_LIST_VAR'] = '[True, False, True]'
+    os.environ['MIXED_LIST_VAR'] = "[1.0, True, 3, 'qwe']"
+    os.environ['UNCASTABLE_LIST_VAR'] = '[1, true]'
+    os.environ['DICT_VAR'] = '{"key": "value"}'
+    os.environ['PROPER_BOOL_VAR'] = 'True'
+    os.environ['OTHER_BOOL_VAR'] = 'true'
+    os.environ['INT_BOOL_VAR'] = '1'
+    os.environ['INT_VAR'] = '123'
+    os.environ['FLOAT_VAR'] = '124.0'
 
+
+@pytest.mark.filterwarnings("ignore")
 @pytest.mark.parametrize('ext', EXTENSIONS)
 def test_env(ext):
     setup_env()
     cfg_filename = locate_data_file(f'env.{ext}')
     args = create_parser(cfg_filename).parse()
 
-    assert args.database == {"ports": ['8000', '8001', '8002'],
-                             "ports_other": ['8000', '8001', '8002'],
-                             "enabled": 'True', "disabled": '',
-                             "connection_max": '5000'}
+    assert args.database == {"ports": [8000, 8001, 8002],
+                             "ports_other": [8000, 8001, 8002],
+                             "enabled": True, "disabled": '',
+                             "connection_max": 5000}
     assert args['database'] == args.database
-    assert args.database.ports == ['8000', '8001', '8002']
+    assert args.database.ports == [8000, 8001, 8002]
     assert args.database.ports == args.database['ports']
     assert args.database.ports == args['database'].ports
     assert args.database.ports == args['database.ports']
-    assert args.database.connection_max == '5000'
+    assert args.database.connection_max == 5000
     assert args.database.connection_max == args.database['connection_max']
     assert args.database.connection_max == args['database'].connection_max
     assert args.database.connection_max == args['database.connection_max']
 
-    assert args.database.enabled == 'True'
-    assert args.database.enabled == 'True'
+    assert args.database.enabled == True
     assert args.servers.alpha == {'ip': '10.0.0.1', 'dc': 'path/ab cd/other_path/qwe'}
     assert args.servers.alpha.ip == '10.0.0.1'
     assert args.servers.alpha.dc == "path/ab cd/other_path/qwe"
@@ -143,5 +157,37 @@ def test_env(ext):
     assert args.servers.beta == {'ip': '10.0.0.2:1337', 'dc': 'path/xyz/other_path'}
     assert args.servers.beta.ip == '10.0.0.2:1337'
     assert args.servers.beta.dc == "path/xyz/other_path"
+
+
+@pytest.mark.parametrize('ext', EXTENSIONS)
+def test_env_casting(ext):
+    setup_env()
+    cfg_filename = locate_data_file(f'env.{ext}')
+    with pytest.warns(UserWarning):
+        args = create_parser(cfg_filename).parse()
+
+    # casting tests
+    assert args.casting.int_ok == 123
+    assert args.casting.float_ok == float(124.0)
+    assert args.casting.bool_ok == True
+    assert args.casting.list_ok == [1, 2, 3]
+    assert args.casting.dict_ok == {"key": "value"}
+    assert args.casting.mixed_list_ok == [1.0, True, 3, 'qwe']
+
+    assert args.casting.uncastable_with_default == 'default_string'
+    assert args.casting.uncastable_without_default == 'qwerty'
+    assert args.casting.uncastable_list_default == '[1, true]'
+    assert args.casting.int_cast == 124
+    assert args.casting.float_cast == float(123.0)
+
+    assert args.casting.list_cast == [1.0, 2.0, 3.0]
+    assert args.casting.uncastable_list_default_cast == [1, 2, 3]
+    assert args.casting.uncastable_list_default_cast_string == '[1, another_uncastable, 3]'
+    assert args.casting.bool_cast == True
+    assert args.casting.string_cast_default == 123
+    assert args.casting.string_cast_forced == '123'
+    assert args.casting.string_cast_forced_default == '124.0'
+    assert args.casting.unexpected_type_cast == 123
+    assert args.casting.unexpected_type_cast_default == 123  # Not 125! Had to compromise.
 
 
