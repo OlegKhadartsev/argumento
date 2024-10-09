@@ -96,18 +96,20 @@ class EnvResolver:
         except (ValueError, TypeError, AttributeError, argparse.ArgumentTypeError) as e:
             if default_value is not None:
                 if cast_type is not None:
-                    warnings.warn(f"Cannot cast '{evaluated_value=}' to {cast_type}: {e}, casting {default_value=}",
+                    warnings.warn(f"Cannot cast evaluated_value='{evaluated_value}' to {cast_type}: {e}, "
+                                  f"casting {default_value}",
                                   CastingWarning)
                 try:
                     default_value = literal_eval(default_value)
                     return cast_func(default_value)
                 except (ValueError, TypeError, SyntaxError) as e_def:
                     if cast_type is not None:
-                        warnings.warn(f"Cannot cast '{default_value=}' to {cast_type}: {e_def}, keeping as is",
+                        warnings.warn(f"Cannot cast default_value='{default_value}' to {cast_type}: {e_def}, "
+                                      f"keeping as is",
                                       CastingWarning)
                     return default_value
             if cast_type is not None:
-                warnings.warn(f"Cannot cast '{evaluated_value=}' to {cast_type}: {e}, keeping as is",
+                warnings.warn(f"Cannot cast evaluated_value='{evaluated_value}' to {cast_type}: {e}, keeping as is",
                               CastingWarning)
             return evaluated_value
 
