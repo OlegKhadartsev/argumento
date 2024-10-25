@@ -1,3 +1,9 @@
+## [1.2.1] - 2024-10-09
+
+### Fixed
+
+- python 3.7 compatibility fix
+
 ## [1.2.0] - 2024-09-19
 
 ### Added
